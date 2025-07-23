@@ -1,0 +1,139 @@
+.login-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Left side with image and text */
+.left-panel {
+  flex: 1;
+background: url('/public/images/signin.jpg') center/cover no-repeat;
+  position: relative;
+  color: white;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 50px;
+  left: 40px;
+  right: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.left-panel h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.left-panel p {
+  font-size: 14px;
+}
+
+/* Right panel for the form */
+.right-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+}
+
+.login-form h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #3e58ef;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  margin-top: -5px;
+  font-size: 13px;
+  color: #555;
+}
+
+.separator {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  height: 1px;
+  background: #ccc;
+  position: absolute;
+  top: 50%;
+  width: 40%;
+}
+
+.separator::before {
+  left: 0;
+}
+
+.separator::after {
+  right: 0;
+}
+
+.social-btn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+body {
+  font-family: 'Outfit', sans-serif;
+}
+.google::before {
+  content: "G ";
+  font-weight: bold;
+  margin-right: 8px;
+  color: red;
+}
+
+.facebook::before {
+  content: "f ";
+  font-weight: bold;
+  margin-right: 8px;
+  color: #3b5998;
+}
+
+.disclaimer {
+  font-size: 11px;
+  margin-top: 20px;
+  text-align: center;
+  color: #777;
+}

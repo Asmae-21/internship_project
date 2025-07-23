@@ -1,0 +1,190 @@
+/* ========= Layout global ========= */
+.teacher-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #f0f4f8;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ========= Sidebar ========= */
+.sidebar {
+  width: 220px;
+  background-color: #1e293b;
+  color: #fff;
+  padding: 30px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+/* ---- Listes ---- */
+.menu-items ul,
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-items li,
+.logout-section li {
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: color 0.3s;
+  display: flex;            /* pour aligner icône + texte */
+  align-items: center;
+}
+
+.menu-items li:hover,
+.logout-section li:hover {
+  color: #60a5fa;
+}
+
+/* ---- Icônes via pseudo‑éléments ---- */
+.menu-items li::before,
+.logout-section li::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.menu-items li:nth-child(1)::before { content: "🏠"; margin-right: 8px; }
+.menu-items li:nth-child(2)::before { content: "➕"; margin-right: 8px; }
+.menu-items li:nth-child(3)::before { content: "📚"; margin-right: 8px; }
+.menu-items li:nth-child(4)::before { content: "⬆️"; margin-right: 8px; }
+.logout-section li:nth-child(1)::before { content: "⚙️"; margin-right: 8px; }
+.logout-section li:nth-child(2)::before { content: "🚪"; margin-right: 8px; }
+
+
+/* ---- Séparation Settings / Log out ---- */
+.logout-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 20px;
+}
+
+/* ========= Contenu principal ========= */
+.main-content {
+  flex: 1;
+  padding: 40px 60px;
+  box-sizing: border-box;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+header h1 { font-size: 28px; color: #1e293b; }
+
+/* ========= Cartes ========= */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-left: 6px solid #3b82f6;
+  border-radius: 12px;
+  padding: 24px 20px;
+  cursor: pointer;
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+
+.card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.1); transform: translateY(-4px); }
+
+.card h2 { margin: 0 0 8px; color: #2563eb; font-size: 20px; }
+.card p  { margin: 0; color: #334155; font-size: 15px; }
+
+/* ========= Tableau ========= */
+.lesson-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.lesson-table th,
+.lesson-table td {
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  text-align: left;
+}
+
+.lesson-table th { background: #f8fafc; color: #1e293b; }
+.lesson-table tbody tr:nth-child(even) { background: #f1f5f9; }
+.lesson-table tr { transition: background 0.2s; }
+.lesson-table tr:hover { background: #e0f2fe; }
+
+.lesson-table .empty {
+  text-align: center;
+  color: #64748b;
+}
+
+/* Puces d’action */
+.note {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  background: #e2e8f0;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.note:hover { background: #2563eb; color: #fff; }
+
+/* ========= Responsive ========= */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { padding: 20px; }
+}
+.welcome-card {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(37, 117, 252, 0.4);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-bottom: 25px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: default;
+}
+
+.welcome-card:hover {
+  transform: translateY(-5px);
+}
+
+.welcome-card h2 {
+  color:beige;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+}
+
+.welcome-card p {
+  color: darkgray;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
