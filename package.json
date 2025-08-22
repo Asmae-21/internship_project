@@ -1,28 +1,17 @@
 {
-  "name": "auth-service",
+  "name": "auth-service-root",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Root package for auth service project",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.17.0",
-    "mongoose": "^8.16.4"
-  },
-  "description": "",
-  "devDependencies": {
-    "@types/node": "^24.1.0",
-    "nodemon": "^3.1.10"
+    "concurrently": "^8.2.2"
   }
 }
