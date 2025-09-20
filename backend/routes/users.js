@@ -38,6 +38,8 @@ router.post('/', uploadMiddleware('photo'), async (req, res) => {
   try {
     const { firstName, lastName, email, phone, classes, subjects, password, role } = req.body;
     
+    console.log('Received data:', { firstName, lastName, email, phone, classes, subjects, role }); // Debug log
+    
     // Check if user with email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -65,7 +67,17 @@ router.post('/', uploadMiddleware('photo'), async (req, res) => {
     
     res.status(201).json(userResponse);
   } catch (err) {
-    res.status(500).json({ error: 'Server error', details: err.message });
+    console.error('Error creating user:', err); // Debug log
+    console.error('Error details:', err.message); // Debug log
+    console.error('Error name:', err.name); // Debug log
+    
+    // Return more detailed error information
+    res.status(500).json({ 
+      error: 'Server error', 
+      details: err.message,
+      name: err.name,
+      code: err.code
+    });
   }
 });
 

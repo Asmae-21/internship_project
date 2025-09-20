@@ -20,6 +20,7 @@ export default function CreateUserPage() {
 
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string>("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -27,6 +28,30 @@ export default function CreateUserPage() {
       ...prev,
       [name]: value
     }));
+
+    // Clear password error when user starts typing
+    if (name === 'password') {
+      setPasswordError("");
+    }
+  };
+
+  const validatePassword = (password: string): string => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/\d/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    if (!/[\W_]/.test(password)) {
+      return "Password must contain at least one special character (!@#$%^&* etc.)";
+    }
+    return "";
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +80,14 @@ export default function CreateUserPage() {
         alert("Passwords do not match");
         return;
       }
+
+      // Validate password strength
+      const passwordValidationError = validatePassword(formData.password);
+      if (passwordValidationError) {
+        setPasswordError(passwordValidationError);
+        alert(`Password Requirements:\n\n• At least 8 characters\n• At least one uppercase letter (A-Z)\n• At least one lowercase letter (a-z)\n• At least one number (0-9)\n• At least one special character (!@#$%^&* etc.)\n\nCurrent error: ${passwordValidationError}`);
+        return;
+      }
       
       // Create form data for multipart/form-data (for file upload)
       const submitData = new FormData();
@@ -71,38 +104,47 @@ export default function CreateUserPage() {
         submitData.append('photo', photoFile);
       }
       
+      console.log('Sending request to create user...');
+      
       // Send data to API
       const response = await fetch('http://localhost:4000/api/users', {
         method: 'POST',
         body: submitData,
-        // Don't set Content-Type header, it will be set automatically with boundary for multipart/form-data
       });
       
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        // Check content type before trying to parse as JSON
+        console.log('Response not ok, status:', response.status);
+        
         const contentType = response.headers.get('content-type');
+        console.log('Content type:', contentType);
+        
         if (contentType && contentType.includes('application/json')) {
           try {
             const errorData = await response.json();
+            console.log('Error data:', errorData);
+            
+            // Check if it's a password validation error from server
+            if (errorData.details && errorData.details.includes('password')) {
+              alert(`Password Requirements:\n\n• At least 8 characters\n• At least one uppercase letter (A-Z)\n• At least one lowercase letter (a-z)\n• At least one number (0-9)\n• At least one special character (!@#$%^&* etc.)\n\nServer error: ${errorData.details}`);
+              return;
+            }
+            
             throw new Error(errorData.error || errorData.message || 'Failed to create user');
           } catch (jsonError) {
-            // If JSON parsing fails, handle as a generic error
             console.error('Failed to parse JSON error response:', jsonError);
             throw new Error('Server returned invalid JSON response');
           }
         } else {
-          // Handle non-JSON responses (like HTML error pages)
           const errorText = await response.text();
           console.error('Server returned non-JSON response:', errorText);
           
-          // Try to extract error message from HTML response
           let errorMessage = 'Server error: The server is not responding properly.';
           
-          // Check for multer file validation error
           if (errorText.includes('Only image files are allowed')) {
             errorMessage = 'Only image files (jpeg, jpg, png, gif) are allowed!';
           } else if (errorText.includes('Error:')) {
-            // Try to extract any error message
             const errorMatch = errorText.match(/Error:([^<]+)/);
             if (errorMatch && errorMatch[1]) {
               errorMessage = errorMatch[1].trim();
@@ -112,6 +154,10 @@ export default function CreateUserPage() {
           throw new Error(errorMessage);
         }
       }
+      
+      // Success - parse the response
+      const responseData = await response.json();
+      console.log('Success! Created user:', responseData);
       
       // Success - redirect to users list
       alert('User created successfully!');
@@ -286,9 +332,20 @@ export default function CreateUserPage() {
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="••••••••••••••••••••"
-                className="w-full"
+                className={`w-full ${passwordError ? 'border-red-500' : ''}`}
                 required
               />
+              {passwordError && (
+                <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+              )}
+              <div className="text-xs text-gray-500 mt-1">
+                <strong>Password Requirements:</strong><br />
+                • At least 8 characters<br />
+                • At least one uppercase letter (A-Z)<br />
+                • At least one lowercase letter (a-z)<br />
+                • At least one number (0-9)<br />
+                • At least one special character (!@#$%^&* etc.)
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -316,7 +373,7 @@ export default function CreateUserPage() {
           </Link>
           <Button type="submit" className="px-8 bg-purple-600 hover:bg-purple-700">
             Save
-            </Button>
+          </Button>
         </div>
       </form>
     </div>
