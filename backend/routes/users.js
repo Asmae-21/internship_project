@@ -4,6 +4,13 @@ const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
 const { uploadMiddleware } = require('../middleware/errorHandler');
+// const { verifyToken, isAdmin } = require('../middleware/auth'); // Comment out these lines
+
+// Apply authentication to all routes
+// router.use(verifyToken); // Comment out this line
+
+// Apply admin-only access to all routes
+// router.use(isAdmin); // Comment out this line
 
 // Get all users
 router.get('/', async (req, res) => {

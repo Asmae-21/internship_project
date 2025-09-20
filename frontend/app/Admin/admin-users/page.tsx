@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 
 interface User {
   _id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string; // Add this for backward compatibility
   email: string;
   phone: string;
   classes: string;
@@ -30,13 +31,11 @@ export default function AdminUsersPage() {
       try {
         const response = await fetch('http://localhost:4000/api/users');
         if (!response.ok) {
-          // Check content type before trying to parse as JSON
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to fetch users');
           } else {
-            // Handle non-JSON responses (like HTML error pages)
             const errorText = await response.text();
             console.error('Server returned non-JSON response:', errorText);
             throw new Error('Server error: The server is not responding properly. Please check if the backend server is running.');
@@ -55,13 +54,40 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, []);
 
+  // Helper function to get display name safely
+  const getDisplayName = (user: User) => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    } else if (user.name) {
+      return user.name;
+    } else {
+      return 'Unknown User';
+    }
+  };
+
+  // Helper function to get initials safely
+  const getInitials = (user: User) => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+    } else if (user.name) {
+      const nameParts = user.name.split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`;
+      } else {
+        return user.name.charAt(0);
+      }
+    } else {
+      return 'U';
+    }
+  };
+
   const filteredUsers = users.filter(user => {
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+    const displayName = getDisplayName(user).toLowerCase();
     const searchLower = searchTerm.toLowerCase();
     return (
-      fullName.includes(searchLower) ||
+      displayName.includes(searchLower) ||
       user.email.toLowerCase().includes(searchLower) ||
-      user.subjects.toLowerCase().includes(searchLower)
+      (user.subjects && user.subjects.toLowerCase().includes(searchLower))
     );
   });
 
@@ -70,24 +96,21 @@ export default function AdminUsersPage() {
     
     try {
       const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
-        method: 'DELETE',
+        method: 'DELETE'
       });
       
       if (!response.ok) {
-        // Check content type before trying to parse as JSON
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to delete user');
         } else {
-          // Handle non-JSON responses (like HTML error pages)
           const errorText = await response.text();
           console.error('Server returned non-JSON response:', errorText);
           throw new Error('Server error: The server is not responding properly. Please check if the backend server is running.');
         }
       }
       
-      // Remove user from state
       setUsers(users.filter(user => user._id !== userId));
       alert('User deleted successfully');
     } catch (err) {
@@ -172,33 +195,33 @@ export default function AdminUsersPage() {
                               <img
                                 className="h-10 w-10 rounded-full object-cover"
                                 src={`http://localhost:4000${user.photo}`}
-                                alt={`${user.firstName} ${user.lastName}`}
+                                alt={getDisplayName(user)}
                               />
                             ) : (
                               <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-semibold">
-                                {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                                {getInitials(user)}
                               </div>
                             )}
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {user.firstName} {user.lastName}
+                              {getDisplayName(user)}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{user.email}</div>
-                        <div className="text-sm text-gray-500">{user.phone}</div>
+                        <div className="text-sm text-gray-500">{user.phone || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-[200px] truncate" title={user.subjects}>
-                          {user.subjects}
+                        <div className="text-sm text-gray-900 max-w-[200px] truncate" title={user.subjects || 'N/A'}>
+                          {user.subjects || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-[200px] truncate" title={user.classes}>
-                          {user.classes}
+                        <div className="text-sm text-gray-900 max-w-[200px] truncate" title={user.classes || 'N/A'}>
+                          {user.classes || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

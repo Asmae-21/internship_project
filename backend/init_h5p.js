@@ -30,21 +30,27 @@ async function main() {
     await User.create([
       {
         _id: new ObjectId('507f1f77bcf86cd799439011'),
-        name: 'Admin User',
+        firstName: 'Admin',
+        lastName: 'User',
         email: 'admin@h5p.com',
         password: 'StrongP@ssw0rd123',
         role: 'admin',
         isActive: true,
-        preferences: { theme: 'light', language: 'fr', notifications: true }
+        phone: '+1234567890',
+        classes: 'All Classes',
+        subjects: 'Administration'
       },
       {
         _id: new ObjectId('507f1f77bcf86cd799439012'),
-        name: 'Teacher User',
+        firstName: 'Teacher',
+        lastName: 'User',
         email: 'teacher@h5p.com',
         password: 'StrongP@ssw0rd123',
         role: 'teacher',
         isActive: true,
-        preferences: { theme: 'light', language: 'fr', notifications: true }
+        phone: '+1234567890',
+        classes: '2Bac SM-A',
+        subjects: 'Mathematics'
       }
     ]);
 
