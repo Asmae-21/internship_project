@@ -2,7 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
     type: String,
     required: true,
     trim: true,
@@ -14,11 +19,28 @@ const userSchema = new mongoose.Schema({
     unique: true,
     match: /^\S+@\S+\.\S+$/,
   },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  classes: {
+    type: String,
+    required: true,
+  },
+  subjects: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,
     minlength: 8,
     match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+  },
+  photo: {
+    type: String,
+    default: '',
   },
   role: {
     type: String,

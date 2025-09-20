@@ -1,22 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors'); // ✅ Add this line
+const cors = require('cors');
+const path = require('path');
 
 dotenv.config();
 const app = express();
 
-// ✅ Enable CORS before any routes
+// Enable CORS before any routes
 app.use(cors({
   origin: 'http://localhost:3000', // allow frontend
   credentials: true
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Add auth routes
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Add routes
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;
@@ -32,6 +40,25 @@ mongoose.connect(mongoUri)
 // Basic test route
 app.get('/', (req, res) => {
   res.send('Hello from the server 🎉');
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Global error handler caught:', err);
+  
+  // Handle multer errors
+  if (err.name === 'MulterError' || err.message.includes('Only image files')) {
+    return res.status(400).json({ 
+      error: err.message || 'Error uploading file',
+      details: 'Only image files (jpeg, jpg, png, gif) are allowed and file size must be under 5MB'
+    });
+  }
+  
+  // Handle other errors
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
 
 // Start server

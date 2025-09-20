@@ -96,9 +96,7 @@ At least one digit
 
 At least one special character
 
-js
-Copier
-Modifier
+
 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
 ✅ Tasks Achieved
  User Authentication (JWT)
@@ -133,3 +131,77 @@ Modifier
   "token": "<JWT Token>",
   "role": "admin"
 }
+
+# Auth Service Backend
+
+This is the backend for the Auth Service application, providing API endpoints for user management and authentication.
+
+## Setup Instructions
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+
+2. Create a `.env` file in the backend directory with the following variables:
+   ```
+   PORT=5000
+   MONGODB_URI=mongodb://localhost:27017/auth-service
+   JWT_SECRET=your_jwt_secret_key
+   ```
+
+3. Start the server:
+   ```
+   npm start
+   ```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Login with email and password
+
+### Users
+- `GET /api/users` - Get all users
+- `GET /api/users/:id` - Get user by ID
+- `POST /api/users` - Create a new user
+- `PUT /api/users/:id` - Update a user
+- `DELETE /api/users/:id` - Delete a user
+
+## Testing User Creation Flow
+
+1. Start the backend server:
+   ```
+   cd backend
+   npm start
+   ```
+
+2. Start the frontend development server:
+   ```
+   cd frontend
+   npm run dev
+   ```
+
+3. Navigate to the admin dashboard at `http://localhost:3000/Admin/admin-dashboard`
+
+4. Click on the "Add New User" button
+
+5. Fill out the user creation form with the following test data:
+   - First Name: Test
+   - Last Name: User
+   - Email: test@example.com
+   - Phone: +1234567890
+   - Classes: Test Class
+   - Subjects: Test Subject
+   - Password: Test@123
+   - Confirm Password: Test@123
+   - Upload a test photo (optional)
+
+6. Click "Save" to create the user
+
+7. You should be redirected to the users list page where the newly created user should appear
+
+## Troubleshooting
+
+- If you encounter CORS issues, make sure the frontend URL is correctly set in the CORS configuration in `app.js`
+- If file uploads are not working, ensure the uploads directory exists and has proper permissions
+- For database connection issues, verify your MongoDB connection string in the `.env` file

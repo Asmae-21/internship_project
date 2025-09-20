@@ -4,6 +4,7 @@ import { User, FileText, Ban, LogIn, Plus, EyeOff, BarChart2, Download } from "l
 import DashboardChartWrapper from "../../Admin/_Components/DashboardChartWrapper";
 import { ContentTypeUsageChart } from "../../Admin/_Components/ContentTypeUsageChart";
 import { DashboardBanner } from "../../Admin/_Components/DashboardBanner";
+import Link from "next/link";
 
 const stats = [
   {
@@ -85,11 +86,23 @@ export default function Home() {
         </div>
         {/* Action Buttons */}
         <div className="flex flex-col gap-4 w-full lg:w-72">
-          {actions.map((action, i) => (
-            <Button key={i} className="w-full h-14 text-base font-semibold flex items-center justify-start gap-3 bg-gradient-to-r from-blue-600 to-purple-400 text-white rounded-xl shadow-none hover:from-blue-700 hover:to-purple-500">
-              {action.icon} {action.text} <span className="ml-auto">&raquo;</span>
-            </Button>
-          ))}
+          {actions.map((action, i) => {
+            // Create a wrapper component based on the action
+            const ButtonWrapper = ({ children }: { children: React.ReactNode }) => {
+              if (action.text === "Add New User") {
+                return <Link href="/Admin/admin-users/create">{children}</Link>;
+              }
+              return <>{children}</>;
+            };
+            
+            return (
+              <ButtonWrapper key={i}>
+                <Button className="w-full h-14 text-base font-semibold flex items-center justify-start gap-3 bg-gradient-to-r from-blue-600 to-purple-400 text-white rounded-xl shadow-none hover:from-blue-700 hover:to-purple-500">
+                  {action.icon} {action.text} <span className="ml-auto">&raquo;</span>
+                </Button>
+              </ButtonWrapper>
+            );
+          })}
         </div>
       </div>
       {/* Bottom Section: Latest Activity & Content Type Usage */}

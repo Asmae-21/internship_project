@@ -57,6 +57,7 @@ You can test login using the frontend at http://localhost:3000
 
 ```
 npm run dev:backend
+node app.js
 ```
 
 ### Frontend Only
