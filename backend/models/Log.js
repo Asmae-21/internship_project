@@ -10,6 +10,18 @@ const logSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  content: {
+    type: String,
+    default: null, // Content title or description
+  },
+  type: {
+    type: String,
+    default: null, // Content type (e.g., 'Interactive Book', 'Quiz', 'Course Presentation')
+  },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}, // Additional content details like file count, tags, etc.
+  },
   timestamp: {
     type: Date,
     default: Date.now,

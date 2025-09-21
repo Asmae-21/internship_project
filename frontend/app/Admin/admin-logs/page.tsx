@@ -10,6 +10,8 @@ interface Log {
     email: string;
   };
   action: string;
+  content?: string;
+  type?: string;
   timestamp: string;
   ipAddress?: string;
   userAgent?: string;
@@ -54,48 +56,49 @@ export default function AdminLogsPage() {
     <div className="flex min-h-screen bg-gray-50 font-sans w-full px-4 py-0">
       <div className="bg-white rounded-xl shadow-sm overflow-hidden w-full h-full">
         <table className="min-w-full w-full table-fixed">
-          <thead className="bg-white">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-5 text-sm font-medium text-gray-700 tracking-wide text-center">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Teacher
               </th>
-              <th className="px-6 py-5 text-sm font-medium text-gray-700 tracking-wide text-center">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Activity
               </th>
-              <th className="px-6 py-5 text-sm font-medium text-gray-700 tracking-wide text-center">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Content
               </th>
-              <th className="px-6 py-5 text-sm font-medium text-gray-700 tracking-wide text-center">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-6 py-5 text-sm font-medium text-gray-700 tracking-wide text-center">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Timestamp
               </th>
             </tr>
           </thead>
 
-          <tbody className="bg-white">
+          <tbody className="bg-white divide-y divide-gray-200">
             {logs.map((log, index) => (
-              <tr
-                key={log._id || index}
-                className={`hover:bg-gray-50 transition-colors ${
-                  index % 2 === 0 ? "border-l-4 border-blue-500" : ""
-                }`}
-              >
-                <td className="px-6 py-5 whitespace-nowrap text-center text-gray-900 font-medium">
+              <tr key={log._id || index} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                   {log.user ? `${log.user.firstName} ${log.user.lastName}` : 'Unknown'}
                 </td>
-                <td className="px-6 py-5 whitespace-nowrap text-center text-blue-600 font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-blue-600">
                   {log.action}
                 </td>
-                <td className="px-6 py-5 whitespace-nowrap text-center text-gray-700 opacity-80">
-                  {log.ipAddress || 'N/A'}
+                <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                  {log.content ? `"${log.content}"` : '—'}
                 </td>
-                <td className="px-6 py-5 whitespace-nowrap text-center text-gray-600">
-                  {log.userAgent || 'N/A'}
+                <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                  {log.type || '—'}
                 </td>
-                <td className="px-6 py-5 whitespace-nowrap text-center text-blue-600 font-medium">
-                  {new Date(log.timestamp).toLocaleString()}
+                <td className="px-6 py-4 whitespace-nowrap text-blue-600">
+                  {new Date(log.timestamp).toLocaleString('en-GB', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </td>
               </tr>
             ))}
