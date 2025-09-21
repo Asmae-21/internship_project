@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { User, FileText, Ban, LogIn, Plus, EyeOff, BarChart2, Download } from "lucide-react";
+import { User, FileText, LogIn, Plus, EyeOff, BarChart2, Download } from "lucide-react";
 import DashboardChartWrapper from "../../Admin/_Components/DashboardChartWrapper";
 import { ContentTypeUsageChart } from "../../Admin/_Components/ContentTypeUsageChart";
 import { DashboardBanner } from "../../Admin/_Components/DashboardBanner";
@@ -12,44 +12,45 @@ const stats = [
     title: "Total Teachers",
     value: 27,
     link: "View Users",
-    href: "#",
+    href: "/Admin/admin-users",
   },
   {
     icon: <FileText className="w-6 h-6 text-blue-500" />,
     title: "Total Content",
     value: 34,
     link: "View Content",
-    href: "#",
-  },
-  {
-    icon: <Ban className="w-6 h-6 text-blue-500" />,
-    title: "Blocked Users",
-    value: 4,
-    link: "Manage Access",
-    href: "#",
+    href: "/Admin/admin-content-audit",
   },
   {
     icon: <LogIn className="w-6 h-6 text-blue-500" />,
     title: "Recent Logins",
     value: 6,
     link: "View Logs",
-    href: "#",
+    href: "/Admin/admin-logs",
     sub: "Today",
   },
 ];
 
 const actions = [
   {
-    icon: <Plus className="w-5 h-5" />, text: "Add New User"
+    icon: <Plus className="size-5" />, 
+    text: "Add New User",
+    href: "/Admin/admin-users/create"
   },
   {
-    icon: <EyeOff className="w-5 h-5" />, text: "Enable/Disable Activity Types"
+    icon: <EyeOff className="w-5 h-5" />, 
+    text: "Enable/Disable Activity Types",
+    href: "/Admin/admin-activity-types"
   },
   {
-    icon: <BarChart2 className="w-5 h-5" />, text: "Content Audit"
+    icon: <BarChart2 className="w-5 h-5" />, 
+    text: "Content Audit",
+    href: "/Admin/admin-content-audit"
   },
   {
-    icon: <Download className="w-5 h-5" />, text: "Download Content Report"
+    icon: <Download className="w-5 h-5" />, 
+    text: "Download Content Report",
+    href: "/Admin/admin-reports"
   },
 ];
 
@@ -65,7 +66,7 @@ export default function Home() {
             <div className="flex-1">
               <div className="text-xs font-semibold text-gray-700 mb-1">{stat.title}</div>
               <div className="text-2xl font-bold text-gray-900">{stat.value} {stat.sub && <span className="text-xs font-normal text-gray-400 ml-1">{stat.sub}</span>}</div>
-              <a href={stat.href} className="text-xs text-blue-500 hover:underline font-medium">{stat.link} &rarr;</a>
+              <Link href={stat.href} className="text-xs text-blue-500 hover:underline font-medium">{stat.link} &rarr;</Link>
             </div>
           </div>
         ))}
@@ -89,8 +90,8 @@ export default function Home() {
           {actions.map((action, i) => {
             // Create a wrapper component based on the action
             const ButtonWrapper = ({ children }: { children: React.ReactNode }) => {
-              if (action.text === "Add New User") {
-                return <Link href="/Admin/admin-users/create">{children}</Link>;
+              if (action.href) {
+                return <Link href={action.href}>{children}</Link>;
               }
               return <>{children}</>;
             };

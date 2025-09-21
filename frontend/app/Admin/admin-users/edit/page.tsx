@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, X } from "lucide-react";
+import toast from 'react-hot-toast';
 
 export default function EditTeacherPage() {
   const [formData, setFormData] = useState({
@@ -126,7 +127,7 @@ export default function EditTeacherPage() {
     e.preventDefault();
 
     if (formData.newPassword && formData.newPassword !== formData.confirmNewPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
@@ -191,7 +192,7 @@ export default function EditTeacherPage() {
       }
       
       // Success - redirect to users list
-      alert('User updated successfully!');
+      toast.success('User updated successfully!');
       window.location.href = '/Admin/admin-users';
     } catch (error) {
       console.error('Error updating user:', error);

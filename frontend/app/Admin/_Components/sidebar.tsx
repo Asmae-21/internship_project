@@ -100,7 +100,7 @@ export function Sidebar() {
               )}
               asChild
             >
-              <Link href="/settings">
+              <Link href="/Admin/admin-settings">
                 <SettingsIcon size={18} className={cn(isOpen ? "mr-3" : "")}/>
                 <span className={cn(isOpen ? "inline" : "hidden")}>Settings</span>
               </Link>
@@ -113,7 +113,7 @@ export function Sidebar() {
               )}
               asChild
             >
-              <Link href="/logout">
+              <Link href="/">
                 <LogOut size={18} className={cn(isOpen ? "mr-3" : "")}/>
                 <span className={cn(isOpen ? "inline" : "hidden")}>Logout</span>
               </Link>
