@@ -22,9 +22,11 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Add routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const logsRoutes = require('./routes/logs');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/logs', logsRoutes);
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
 
+const Log = require('../models/Log');
+
 // Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -20,6 +22,16 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
+
+    // Create a log entry for teacher login
+    if (user.role === 'teacher') {
+      const logEntry = new Log({
+        user: user._id,
+        action: 'Logged in',
+        timestamp: new Date(),
+      });
+      await logEntry.save();
+    }
 
     res.status(200).json({ token, role: user.role });
   } catch (err) {

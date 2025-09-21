@@ -45,42 +45,42 @@ const notificationsPast = [
 
 export default function AdminNotificationsPage() {
   return (
-    <div className="px-8 py-3">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Notifications</h2>
-      <div className="bg-white rounded-xl shadow p-6">
-        {/* Today */}
-        <div>
-          <div className="text-lg font-semibold text-gray-700 mb-4">Today <span className="text-gray-400 font-normal">({notificationsToday.length})</span></div>
-          <div className="flex flex-col gap-4">
-            {notificationsToday.map((n, i) => (
-              <div key={i} className="flex items-center gap-4 bg-gray-50 rounded-md px-4 py-3">
-                <div className="flex-shrink-0">{n.icon}</div>
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-800">{n.title}</div>
-                  <div className="text-gray-600 text-sm">{n.description}</div>
-                </div>
-                <div className="text-xs text-gray-400 whitespace-nowrap">{n.time}</div>
-              </div>
-            ))}
+      <div className="px-8 py-3">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Notifications</h2>
+        <div className="bg-white rounded-xl shadow p-6">
+          {/* Today */}
+          <div>
+            <div className="text-lg font-semibold text-gray-700 mb-4">Today <span className="text-gray-400 font-normal">({notificationsToday.length})</span></div>
+            <div className="flex flex-col gap-4">
+              {notificationsToday.map((n, i) => (
+                  <div key={i} className="flex items-center gap-4 bg-gray-50 rounded-md px-4 py-3">
+                    <div className="flex-shrink-0">{n.icon}</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-800">{n.title}</div>
+                      <div className="text-gray-600 text-sm">{n.description}</div>
+                    </div>
+                    <div className="text-xs text-gray-400 whitespace-nowrap">{n.time}</div>
+                  </div>
+              ))}
+            </div>
           </div>
-        </div>
-        {/* Past */}
-        <div className="mt-8">
-          <div className="text-lg font-semibold text-gray-700 mb-4">Past <span className="text-gray-400 font-normal">({notificationsPast.length})</span></div>
-          <div className="flex flex-col gap-4">
-            {notificationsPast.map((n, i) => (
-              <div key={i} className="flex items-center gap-4 bg-gray-50 rounded-md px-4 py-3">
-                <div className="flex-shrink-0">{n.icon}</div>
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-800">{n.title}</div>
-                  <div className="text-gray-600 text-sm">{n.description}</div>
-                </div>
-                <div className="text-xs text-gray-400 whitespace-nowrap">{n.time}</div>
-              </div>
-            ))}
+          {/* Past */}
+          <div className="mt-8">
+            <div className="text-lg font-semibold text-gray-700 mb-4">Past <span className="text-gray-400 font-normal">({notificationsPast.length})</span></div>
+            <div className="flex flex-col gap-4">
+              {notificationsPast.map((n, i) => (
+                  <div key={i} className="flex items-center gap-4 bg-gray-50 rounded-md px-4 py-3">
+                    <div className="flex-shrink-0">{n.icon}</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-800">{n.title}</div>
+                      <div className="text-gray-600 text-sm">{n.description}</div>
+                    </div>
+                    <div className="text-xs text-gray-400 whitespace-nowrap">{n.time}</div>
+                  </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }
