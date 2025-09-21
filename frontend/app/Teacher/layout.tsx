@@ -9,7 +9,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isOpen } = useSidebarState();
+  const { isOpen } = useSidebarState();               
   return (
     <div>
       <Sidebar />

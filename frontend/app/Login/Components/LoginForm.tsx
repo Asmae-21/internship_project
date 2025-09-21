@@ -43,10 +43,12 @@ export default function LoginForm({ onLogin }) {
         throw new Error('Invalid response from server: missing token or role');
       }
       
-      // Store token in localStorage
+      // Store token and user information in localStorage
       localStorage.setItem('token', data.token);
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
       console.log('User role:', data.role);
-      
+      console.log('User info stored:', data.user);
+
       // Call the onLogin function with the user role from the response
       onLogin(data.role);
     } catch (err) {

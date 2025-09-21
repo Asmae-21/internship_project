@@ -22,10 +22,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Add routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const contentRoutes = require('./routes/contents');
 const logsRoutes = require('./routes/logs');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/contents', contentRoutes);
 app.use('/api/logs', logsRoutes);
 
 // MongoDB connection
@@ -50,9 +52,9 @@ app.use((err, req, res, next) => {
   
   // Handle multer errors
   if (err.name === 'MulterError' || err.message.includes('Only image files')) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       error: err.message || 'Error uploading file',
-      details: 'Only image files (jpeg, jpg, png, gif) are allowed and file size must be under 5MB'
+      details: 'Only image files (jpeg, jpg, png, gif) are allowed and file size must be under 30MB'
     });
   }
   

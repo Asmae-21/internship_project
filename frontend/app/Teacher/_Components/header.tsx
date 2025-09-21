@@ -29,6 +29,7 @@ export function Header() {
   let title = "DASHBOARD";
   if (pathname === "/settings") title = "SETTINGS";
   else if (pathname === "/logout") title = "LOGOUT";
+  else if (pathname.startsWith("/Teacher/Content")) title = "";
   else {
     const currentMenu = menuItems.find((item) => item.href === pathname);
     if (currentMenu) title = currentMenu.label.toUpperCase();
@@ -75,7 +76,7 @@ export function Header() {
             <Tooltip delayDuration={100}>
               <TooltipTrigger>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full" asChild>
                     <Avatar className="h-10 w-10">
                       <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User Avatar" />
                       <AvatarFallback>U</AvatarFallback>

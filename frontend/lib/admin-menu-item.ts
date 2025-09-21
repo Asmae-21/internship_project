@@ -10,6 +10,7 @@ import {
   FilePlus2,
   Upload,
   LogOut,
+  FileText,
 } from "lucide-react";
 
 // Define the type for a single menu item.

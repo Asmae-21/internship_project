@@ -33,7 +33,17 @@ router.post('/login', async (req, res) => {
       await logEntry.save();
     }
 
-    res.status(200).json({ token, role: user.role });
+    res.status(200).json({
+      token,
+      role: user.role,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

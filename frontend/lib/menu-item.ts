@@ -7,8 +7,8 @@ import {
   type LucideIcon,
   LayoutDashboard,
   Library,
-  FilePlus2,
   LogOut,
+  FileText,
 } from "lucide-react";
 
 // Define the type for a single menu item.
@@ -23,14 +23,15 @@ export function getMenuList(): MenuItem[] {
   return [
     {
       href: "/Teacher/Dashboard",
-      label: "Dashbaord",
+      label: "Dashboard",
       icon: LayoutDashboard,
     },
     {
-      href: "/Teacher/Create",
-      label: "Create New Content",
-      icon: FilePlus2,
+      href: "/Teacher/Content",
+      label: "My Content",
+      icon: FileText,
     },
+
     {
       href: "/Teacher/Library",
       label: "My Library",
