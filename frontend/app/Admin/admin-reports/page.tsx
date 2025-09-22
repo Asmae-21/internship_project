@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { TrendingUp, Download, Medal, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,21 +15,103 @@ import {
   LabelList,
 } from "recharts";
 import ContentChart from "../_Components/ContentChart";
+import toast from "react-hot-toast";
 
-const chartData = [
-  { name: "Interactive Video", thisWeek: 74, lastWeek: 97 },
-  { name: "Quiz", thisWeek: 56, lastWeek: 43 },
-  { name: "Course Presentation", thisWeek: 30, lastWeek: 36 },
-  { name: "Interactive Book", thisWeek: 39, lastWeek: 47 },
-  { name: "Multiple Choice", thisWeek: 20, lastWeek: 29 },
-  { name: "Drag & Drop", thisWeek: 81, lastWeek: 66 },
-  { name: "Fill in the Blanks", thisWeek: 54, lastWeek: 74 },
-  { name: "Single Choice", thisWeek: 54, lastWeek: 74 },
-  { name: "Image Hotspot", thisWeek: 39, lastWeek: 48 },
-  { name: "True / False", thisWeek: 74, lastWeek: 97 },
-];
+interface ContentStats {
+  contentThisPeriod: number;
+  mostUsedContentType: string;
+  mostUsedContentTypeCount: number;
+  period: string;
+}
+
+interface TeacherStats {
+  teachers: Array<{
+    rank: number;
+    name: string;
+    email: string;
+    activityCount: number;
+    medal: string;
+  }>;
+  period: string;
+}
+
+interface ContentTypeStats {
+  chartData: Array<{
+    name: string;
+    thisWeek: number;
+    lastWeek: number;
+  }>;
+  period: string;
+}
 
 export default function AdminReportsPage() {
+  const [contentStats, setContentStats] = useState<ContentStats | null>(null);
+  const [teacherStats, setTeacherStats] = useState<TeacherStats | null>(null);
+  const [contentTypeStats, setContentTypeStats] = useState<ContentTypeStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState("week");
+
+  useEffect(() => {
+    fetchAllStats();
+  }, [selectedPeriod]);
+
+  const fetchAllStats = async () => {
+    setLoading(true);
+    try {
+      // Fetch content statistics
+      const contentResponse = await fetch(`http://localhost:4000/api/reports/stats/content?period=${selectedPeriod}`);
+      if (contentResponse.ok) {
+        const contentData = await contentResponse.json();
+        setContentStats(contentData);
+      }
+
+      // Fetch teacher statistics
+      const teacherResponse = await fetch(`http://localhost:4000/api/reports/stats/teachers?period=${selectedPeriod}`);
+      if (teacherResponse.ok) {
+        const teacherData = await teacherResponse.json();
+        setTeacherStats(teacherData);
+      }
+
+      // Fetch content type statistics
+      const contentTypeResponse = await fetch(`http://localhost:4000/api/reports/stats/content-types?period=${selectedPeriod}`);
+      if (contentTypeResponse.ok) {
+        const contentTypeData = await contentTypeResponse.json();
+        setContentTypeStats(contentTypeData);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      toast.error('Failed to load statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/reports/export/all');
+      if (!response.ok) {
+        throw new Error('Failed to export data');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'admin_data_export.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success('Data exported successfully');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast.error('Failed to export data');
+    }
+  };
+
+  const chartData = contentTypeStats?.chartData || [];
   return (
     <div className="space-y-6 bg-gray-50 min-h-screen p-6">
       {/* Top Section - Left and Right Columns */}
@@ -48,7 +131,9 @@ export default function AdminReportsPage() {
                     </h3>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-gray-900">32</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      {loading ? '...' : contentStats?.contentThisPeriod || 0}
+                    </span>
                     <div className="flex items-center gap-2">
                       <div className="bg-purple-100 rounded-full p-1">
                         <TrendingUp className="w-4 h-4 text-purple-600" />
@@ -75,7 +160,7 @@ export default function AdminReportsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-3xl font-bold text-gray-900">
-                      Quiz
+                      {loading ? '...' : contentStats?.mostUsedContentType || 'None'}
                     </span>
                   </div>
                 </div>
@@ -102,7 +187,7 @@ export default function AdminReportsPage() {
             </div>
 
             <div className="h-80">
-              <ContentChart />
+              <ContentChart period={selectedPeriod} />
             </div>
           </div>
         </div>
@@ -110,7 +195,10 @@ export default function AdminReportsPage() {
         {/* Right Side - Export Button and Teacher List */}
         <div className="space-y-6">
           {/* Export Button */}
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 cursor-pointer">
+          <Button
+            onClick={handleExportCSV}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 cursor-pointer"
+          >
             <Download className="w-4 h-4" />
             Export All Data (CSV)
           </Button>
@@ -129,26 +217,27 @@ export default function AdminReportsPage() {
             </div>
 
             <div className="space-y-3">
-              {[
-                { name: "Amina Bensalah", count: "12", medal: "🥇" },
-                { name: "Yassine Bouzid", count: "9", medal: "🥈" },
-                { name: "Fatima Belkacem", count: "7", medal: "🥉" },
-                { name: "Soufiane Bakkali", count: "6", rank: "4" },
-                { name: "Laila Benchekroun", count: "4", rank: "5" },
-              ].map((teacher, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-2"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">
-                      {teacher.medal || teacher.rank}
-                    </span>
-                    <span className="text-gray-700">{teacher.name}</span>
+              {loading ? (
+                <div className="text-center text-gray-500 py-4">Loading teachers...</div>
+              ) : teacherStats?.teachers && teacherStats.teachers.length > 0 ? (
+                teacherStats.teachers.map((teacher) => (
+                  <div
+                    key={teacher.email}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{teacher.medal}</span>
+                      <span className="text-gray-700">{teacher.name}</span>
+                    </div>
+                    <span className="text-gray-500">{teacher.activityCount}</span>
                   </div>
-                  <span className="text-gray-500">{teacher.count}</span>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  <p>No teacher activity data available</p>
+                  <p className="text-sm mt-2">Teachers will appear here once they start creating content and performing actions in the system.</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

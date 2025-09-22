@@ -24,11 +24,13 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const contentRoutes = require('./routes/contents');
 const logsRoutes = require('./routes/logs');
+const reportsRoutes = require('./routes/reports');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contents', contentRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;
