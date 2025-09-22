@@ -19,19 +19,32 @@ router.get('/', async (req, res) => {
 // Get content type statistics
 router.get('/stats/types', async (req, res) => {
   try {
+    // Get all possible content types from the enum
+    const allContentTypes = ['Lesson', 'Quiz', 'Assignment', 'Project', 'Worksheet', 'Summary', 'Schema', 'Course Outline'];
+
+    // Get actual counts from database
     const contentTypeStats = await Content.aggregate([
       {
         $group: {
           _id: '$type',
           count: { $sum: 1 }
         }
-      },
-      {
-        $sort: { count: -1 }
       }
     ]);
 
-    res.status(200).json(contentTypeStats);
+    // Create a map of existing content types and their counts
+    const statsMap = {};
+    contentTypeStats.forEach(stat => {
+      statsMap[stat._id] = stat.count;
+    });
+
+    // Combine all content types with their counts (0 for unused types)
+    const allContentTypeStats = allContentTypes.map(type => ({
+      _id: type,
+      count: statsMap[type] || 0
+    })).sort((a, b) => b.count - a.count);
+
+    res.status(200).json(allContentTypeStats);
   } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
