@@ -87,35 +87,11 @@ router.post('/', uploadMiddleware('files'), async (req, res) => {
 
     // Log the content creation activity
     try {
-      // Determine content type based on files or tags
-      let contentType = 'Content';
-      if (files && files.length > 0) {
-        const fileExtension = files[0].split('.').pop().toLowerCase();
-        if (['pdf', 'doc', 'docx'].includes(fileExtension)) {
-          contentType = 'Document';
-        } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-          contentType = 'Image';
-        } else if (['mp4', 'avi', 'mov'].includes(fileExtension)) {
-          contentType = 'Video';
-        }
-      }
-
-      // Check tags for content type hints
-      if (parsedTags.some(tag => tag.toLowerCase().includes('quiz'))) {
-        contentType = 'Multiple Choice';
-      } else if (parsedTags.some(tag => tag.toLowerCase().includes('presentation'))) {
-        contentType = 'Course Presentation';
-      } else if (parsedTags.some(tag => tag.toLowerCase().includes('book'))) {
-        contentType = 'Interactive Book';
-      } else if (parsedTags.some(tag => tag.toLowerCase().includes('video'))) {
-        contentType = 'Interactive Video';
-      }
-
       const logEntry = new Log({
         user: createdBy,
         action: 'Created content',
         content: title,
-        type: contentType,
+        type: type, // Use the actual content type selected by the teacher
         metadata: {
           description: description,
           tags: parsedTags,
@@ -191,35 +167,11 @@ router.put('/:id', uploadMiddleware('files'), async (req, res) => {
 
     // Log the content editing activity
     try {
-      // Determine content type based on files or tags
-      let contentType = 'Content';
-      if (updatedContent.files && updatedContent.files.length > 0) {
-        const fileExtension = updatedContent.files[0].split('.').pop().toLowerCase();
-        if (['pdf', 'doc', 'docx'].includes(fileExtension)) {
-          contentType = 'Document';
-        } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-          contentType = 'Image';
-        } else if (['mp4', 'avi', 'mov'].includes(fileExtension)) {
-          contentType = 'Video';
-        }
-      }
-
-      // Check tags for content type hints
-      if (updatedContent.tags && updatedContent.tags.some(tag => tag.toLowerCase().includes('quiz'))) {
-        contentType = 'Multiple Choice';
-      } else if (updatedContent.tags && updatedContent.tags.some(tag => tag.toLowerCase().includes('presentation'))) {
-        contentType = 'Course Presentation';
-      } else if (updatedContent.tags && updatedContent.tags.some(tag => tag.toLowerCase().includes('book'))) {
-        contentType = 'Interactive Book';
-      } else if (updatedContent.tags && updatedContent.tags.some(tag => tag.toLowerCase().includes('video'))) {
-        contentType = 'Interactive Video';
-      }
-
       const logEntry = new Log({
         user: updatedContent.createdBy,
         action: 'Edited content',
         content: updatedContent.title,
-        type: contentType,
+        type: updatedContent.type, // Use the actual content type selected by the teacher
         metadata: {
           description: updatedContent.description,
           tags: updatedContent.tags,
