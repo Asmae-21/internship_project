@@ -16,7 +16,7 @@ export default function CreateContentPage() {
     title: '',
     description: '',
     tags: '',
-    isActive: true,
+    type: 'Lesson',
   });
   const [files, setFiles] = useState<File[]>([]);
 
@@ -155,23 +155,29 @@ export default function CreateContentPage() {
               </p>
             </div>
 
-            {/* Status */}
+            {/* Content Type */}
             <div>
-              <label htmlFor="isActive" className="block text-sm font-medium text-gray-700 mb-2">
-                Status
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                Content Type
               </label>
               <select
-                id="isActive"
-                name="isActive"
-                value={formData.isActive.toString()}
+                id="type"
+                name="type"
+                value={formData.type}
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
-                  isActive: e.target.value === 'true'
+                  type: e.target.value
                 }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                <option value="Lesson">Lesson</option>
+                <option value="Quiz">Quiz</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Project">Project</option>
+                <option value="Worksheet">Worksheet</option>
+                <option value="Summary">Summary</option>
+                <option value="Schema">Schema</option>
+                <option value="Course Outline">Course Outline</option>
               </select>
             </div>
 

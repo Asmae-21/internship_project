@@ -77,6 +77,7 @@ router.post('/', uploadMiddleware('files'), async (req, res) => {
     const newContent = new Content({
       title,
       description,
+      type,
       tags: parsedTags,
       files,
       createdBy,
@@ -141,7 +142,7 @@ router.post('/', uploadMiddleware('files'), async (req, res) => {
 // Update content
 router.put('/:id', uploadMiddleware('files'), async (req, res) => {
   try {
-    const { title, description, type, tags, isActive } = req.body;
+    const { title, description, type, tags } = req.body;
 
     // Safely parse tags for update
     let parsedTags = undefined;
@@ -157,8 +158,8 @@ router.put('/:id', uploadMiddleware('files'), async (req, res) => {
     const updateData = {
       title,
       description,
+      type,
       tags: parsedTags,
-      isActive,
       updatedAt: Date.now(),
     };
 

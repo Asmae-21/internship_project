@@ -27,10 +27,6 @@ const contentSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
   createdAt: {
     type: Date,
     default: Date.now,

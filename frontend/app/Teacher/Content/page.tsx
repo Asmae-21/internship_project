@@ -7,6 +7,7 @@ import { Pencil, Trash2, Search, Eye, ChevronDown, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 
+
 interface Content {
   _id: string;
   title: string;
@@ -19,7 +20,7 @@ interface Content {
     lastName: string;
     email: string;
   };
-  isActive: boolean;
+  type: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +34,6 @@ export default function TeacherContentPage() {
   // Filter states
   const [showFilters, setShowFilters] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    status: true,
     type: true,
     owner: false,
     date: true,
@@ -41,11 +41,6 @@ export default function TeacherContentPage() {
   });
 
   const [filters, setFilters] = useState({
-    status: {
-      all: true,
-      active: false,
-      inactive: false,
-    },
     type: [] as string[],
     owner: [] as string[],
     date: {
@@ -115,11 +110,9 @@ export default function TeacherContentPage() {
                          content.createdBy.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          content.createdBy.lastName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = filters.status.all ||
-                         (filters.status.active && content.isActive) ||
-                         (filters.status.inactive && !content.isActive);
+    const matchesType = filters.type.length === 0 || filters.type.includes(content.type);
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesType;
   });
 
   const sortedContents = [...filteredContents].sort((a, b) => {
@@ -200,46 +193,37 @@ export default function TeacherContentPage() {
           {showFilters && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Status Filter */}
+                {/* Type Filter */}
                 <div>
-                  <h4 className="font-medium mb-2">Status</h4>
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.status.all}
-                        onChange={() => setFilters(prev => ({
-                          ...prev,
-                          status: { all: true, active: false, inactive: false }
-                        }))}
-                        className="mr-2"
-                      />
-                      All
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.status.active}
-                        onChange={() => setFilters(prev => ({
-                          ...prev,
-                          status: { ...prev.status, all: false, active: !prev.status.active }
-                        }))}
-                        className="mr-2"
-                      />
-                      Active
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.status.inactive}
-                        onChange={() => setFilters(prev => ({
-                          ...prev,
-                          status: { ...prev.status, all: false, inactive: !prev.status.inactive }
-                        }))}
-                        className="mr-2"
-                      />
-                      Inactive
-                    </label>
+                  <h4 className="font-medium mb-2">Content Type</h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {[
+                      'Lesson',
+                      'Quiz',
+                      'Assignment',
+                      'Project',
+                      'Worksheet',
+                      'Summary',
+                      'Schema',
+                      'Course Outline',
+                    ].map((type) => (
+                      <label key={type} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={filters.type.includes(type)}
+                          onChange={() => {
+                            setFilters((prev) => {
+                              const newTypes = prev.type.includes(type)
+                                ? prev.type.filter((t) => t !== type)
+                                : [...prev.type, type];
+                              return { ...prev, type: newTypes };
+                            });
+                          }}
+                          className="mr-2"
+                        />
+                        {type}
+                      </label>
+                    ))}
                   </div>
                 </div>
 
@@ -271,7 +255,7 @@ export default function TeacherContentPage() {
                   Title
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Status
+                  Content Type
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Created
@@ -304,14 +288,8 @@ export default function TeacherContentPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      content.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {content.isActive ? 'Active' : 'Inactive'}
-                    </span>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {content.type}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(content.createdAt).toLocaleDateString()}
