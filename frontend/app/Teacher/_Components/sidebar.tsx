@@ -36,13 +36,11 @@ export function Sidebar() {
           </div>
           <div className="flex items-center justify-center py-8">
             <Link href="/" className="flex items-center justify-center">
-              <div className="relative w-12 h-12">
-                <Image
-                  src="/hb-logo.svg"
+              <div className="relative">
+                <img
+                  src="/image.png"
                   alt="HB Logo"
-                  fill
-                  className="object-contain"
-                  priority
+                  style={{ width: '100%', height: '100%' }}
                 />
               </div>
             </Link>
