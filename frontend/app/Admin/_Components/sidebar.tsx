@@ -1,20 +1,21 @@
-"use client" // This component needs client-side interactivity for state management and navigation.
+"use client"
 
-import Link from "next/link" // Next.js Link component for client-side navigation.
-import { usePathname } from "next/navigation" // Hook to get the current URL path.
-import { ChevronLeft, PanelsTopLeft, LogOut, Settings as SettingsIcon } from "lucide-react" // Icons for toggle and brand.
+import Link from "next/link"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
+import { ChevronLeft, PanelsTopLeft, LogOut, Settings as SettingsIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils" // Our utility function for class names.
-import { Button } from "@/components/ui/button" // shadcn/ui Button component.
-import { ScrollArea } from "@/components/ui/scroll-area" // shadcn/ui ScrollArea for scrollable content.
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip" // shadcn/ui Tooltip components.
-import { useSidebarState } from "@/hook/use-sidebar-state" // Our custom sidebar state hook.
-import { getMenuList } from "@/lib/admin-menu-item" // Our menu data.
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useSidebarState } from "@/hook/use-sidebar-state"
+import { getMenuList } from "@/lib/admin-menu-item"
 
 export function Sidebar() {
-  const { isOpen, toggle } = useSidebarState() // Get the current state and toggle function from our hook.
-  const pathname = usePathname() // Get the current path to highlight active links.
-  const menuItems = getMenuList() // Get the array of menu items.
+  const { isOpen, toggle } = useSidebarState()
+  const pathname = usePathname()
+  const menuItems = getMenuList()
 
   return (
     <aside
@@ -40,15 +41,14 @@ export function Sidebar() {
               isOpen ? "translate-x-0" : "translate-x-1",
             )}
           >
-            <Link href="/" className="flex items-center gap-2">
-              <span
-                className={cn(
-                  "font-bold text-lg text-blue-600 whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300 tracking-wider",
-                  isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full hidden",
-                )}
-              >
-                LOGO
-              </span>
+            <Link href="/" className="flex items-center justify-center">
+              <div className="relative">
+                <img
+                  src="/image.png"
+                  alt="HB Logo"
+                  style={{ width: '100%', height: '100%' }}
+                />
+              </div>
             </Link>
           </h1>
           <ScrollArea className="h-full py-10">
@@ -61,7 +61,7 @@ export function Sidebar() {
                         variant="ghost"
                         className={cn(
                           "w-full justify-start h-10 rounded-lg font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors",
-                          pathname === item.href && "bg-blue-600 text-white hover:bg-blue-700",
+                          pathname === item.href && "bg-[#FF1493] text-white hover:bg-[#FF1493]/90",
                           !isOpen && "justify-center"
                         )}
                         asChild
@@ -95,7 +95,7 @@ export function Sidebar() {
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start h-10 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-lg font-medium",
+                "w-full justify-start h-10 text-gray-700 hover:bg-gray-100 hover:text-[#FF1493] rounded-lg font-medium",
                 !isOpen && "justify-center"
               )}
               asChild

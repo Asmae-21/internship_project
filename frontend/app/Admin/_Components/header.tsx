@@ -1,7 +1,7 @@
 "use client" // This component needs client-side interactivity for dropdowns and sheets.
 
 import Link from "next/link" // Next.js Link component.
-import { MenuIcon, PanelsTopLeft, LogOut, User, Bell } from "lucide-react" // Icons for menu, brand, and user dropdown.
+import { MenuIcon, PanelsTopLeft, LogOut, User } from "lucide-react" // Icons for menu, brand, and user dropdown.
 import { usePathname } from "next/navigation" // Hook to get the current URL path (for mobile menu active state).
 import { Button } from "@/components/ui/button" // shadcn/ui Button component.
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar" // shadcn/ui Avatar components.
@@ -73,12 +73,6 @@ export function Header() {
                       <DropdownMenuItem>Ar (AR)</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-          {/* Notification Bell */}
-          <div className="relative">
-            <Bell className="w-5 h-5 text-gray-400" />
-            {/* Red dot for unread notification */}
-            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
-          </div>
           {/* User Avatar */}
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User Avatar" />

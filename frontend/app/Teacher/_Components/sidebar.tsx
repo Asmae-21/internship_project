@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, PanelsTopLeft, LogOut, Settings as SettingsIcon } from "lucide-react";
 
@@ -34,8 +35,16 @@ export function Sidebar() {
             </Button>
           </div>
           <div className="flex items-center justify-center py-8">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="font-extrabold text-2xl text-blue-600 tracking-wide">LOGO</span>
+            <Link href="/" className="flex items-center justify-center">
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/hb-logo.svg"
+                  alt="HB Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </div>
           <ScrollArea className="h-[calc(100vh-220px)] px-2">
@@ -49,8 +58,8 @@ export function Sidebar() {
                         className={cn(
                           "w-full flex items-center gap-3 px-4 py-2 rounded-lg text-base font-medium transition-colors",
                           pathname === item.href
-                            ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                            : "text-gray-700 hover:bg-gray-100 hover:text-blue-600",
+                            ? "bg-[#FF1493] text-white hover:bg-[#FF1493]/90"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-[#FF1493]",
                           isOpen ? "justify-start" : "justify-center"
                         )}
                         asChild
@@ -81,7 +90,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors",
+              "w-full flex items-center gap-3 px-4 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF1493] transition-colors",
               isOpen ? "justify-start" : "justify-center"
             )}
             asChild

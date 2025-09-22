@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { User, FileText, LogIn, Plus, EyeOff, BarChart2, Download } from "lucide-react";
@@ -6,30 +9,23 @@ import { ContentTypeUsageChart } from "../../Admin/_Components/ContentTypeUsageC
 import { DashboardBanner } from "../../Admin/_Components/DashboardBanner";
 import Link from "next/link";
 
-const stats = [
-  {
-    icon: <User className="w-6 h-6 text-blue-500" />,
-    title: "Total Teachers",
-    value: 27,
-    link: "View Users",
-    href: "/Admin/admin-users",
-  },
-  {
-    icon: <FileText className="w-6 h-6 text-blue-500" />,
-    title: "Total Content",
-    value: 34,
-    link: "View Content",
-    href: "/Admin/admin-content-audit",
-  },
-  {
-    icon: <LogIn className="w-6 h-6 text-blue-500" />,
-    title: "Recent Logins",
-    value: 6,
-    link: "View Logs",
-    href: "/Admin/admin-logs",
-    sub: "Today",
-  },
-];
+interface UserData {
+  _id: string;
+  firstName?: string;  // Make optional
+  lastName?: string;   // Make optional
+  email: string;
+  role: string;
+  isActive: boolean;
+  subjects: string;
+  createdAt: string;
+}
+
+interface DashboardStats {
+  totalTeachers: number;
+  totalContent: number;
+  recentLogins: number;
+  activeUsers: number;
+}
 
 const actions = [
   {
@@ -55,17 +51,108 @@ const actions = [
 ];
 
 export default function Home() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalTeachers: 0,
+    totalContent: 0,
+    recentLogins: 0,
+    activeUsers: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState<UserData[]>([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch users data
+        const response = await fetch('http://localhost:4000/api/users');
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const users: UserData[] = await response.json();
+        
+        // Calculate stats
+        const totalTeachers = users.filter(user => user.role === 'teacher').length;
+        const activeUsers = users.filter(user => user.isActive).length;
+        const totalContent = users.filter(user => user.subjects && user.subjects.trim() !== '').length;
+        
+        // Get recent activity (last 4 users created)
+        const recentUsers = users
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 4);
+
+        setStats({
+          totalTeachers,
+          totalContent,
+          recentLogins: activeUsers,
+          activeUsers
+        });
+        
+        setRecentActivity(recentUsers);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  const statsData = [
+    {
+      icon: <User className="w-6 h-6 text-blue-500" />,
+      title: "Total Teachers",
+      value: stats.totalTeachers,
+      link: "View Users",
+      href: "/Admin/admin-users",
+    },
+    {
+      icon: <FileText className="w-6 h-6 text-blue-500" />,
+      title: "Total Content",
+      value: stats.totalContent,
+      link: "View Content",
+      href: "/Admin/admin-content-audit",
+    },
+    {
+      icon: <LogIn className="w-6 h-6 text-blue-500" />,
+      title: "Active Users",
+      value: stats.activeUsers,
+      link: "View Logs",
+      href: "/Admin/admin-logs",
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-8">
+        <DashboardBanner />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-xl shadow-md flex items-center px-6 py-4 gap-4 min-w-[200px] animate-pulse">
+              <div className="w-6 h-6 bg-gray-200 rounded"></div>
+              <div className="flex-1">
+                <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-20"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <DashboardBanner />
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {statsData.map((stat, i) => (
           <div key={i} className="bg-white rounded-xl shadow-md flex items-center px-6 py-4 gap-4 min-w-[200px]">
             <div>{stat.icon}</div>
             <div className="flex-1">
               <div className="text-xs font-semibold text-gray-700 mb-1">{stat.title}</div>
-              <div className="text-2xl font-bold text-gray-900">{stat.value} {stat.sub && <span className="text-xs font-normal text-gray-400 ml-1">{stat.sub}</span>}</div>
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
               <Link href={stat.href} className="text-xs text-blue-500 hover:underline font-medium">{stat.link} &rarr;</Link>
             </div>
           </div>
@@ -110,37 +197,49 @@ export default function Home() {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Latest Activity */}
         <div className="flex-1 bg-white rounded-2xl shadow-md p-8 min-w-0 mb-4 lg:mb-0">
-          <div className="text-xl font-bold text-gray-800 mb-6">Lastest Activity</div>
+          <div className="text-xl font-bold text-gray-800 mb-6">Latest Activity</div>
           <div className="flex flex-col gap-6">
-            {/* Exemple d'activité, à remplacer par des données dynamiques si besoin */}
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-blue-500">SB</div>
-              <div>
-                <span className="font-semibold text-gray-700">Sara Bennis</span> created new content: <span className="font-bold text-red-500">Water Cycle</span>
-                <div className="text-xs text-gray-400 mt-1">2 March 2021, 13:45 PM</div>
+            {recentActivity.length > 0 ? (
+              recentActivity.map((user, index) => {
+                // Safe initials generation
+                const initials = user.firstName && user.lastName 
+                  ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
+                  : user.firstName 
+                    ? user.firstName.charAt(0)
+                    : user.lastName 
+                      ? user.lastName.charAt(0)
+                      : 'U';
+
+                // Safe full name generation
+                const fullName = user.firstName && user.lastName 
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || 'Unknown User';
+
+                const createdDate = new Date(user.createdAt).toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+                
+                return (
+                  <div key={user._id} className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-blue-500">
+                      {initials}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-gray-700">{fullName}</span> joined the platform
+                      <div className="text-xs text-gray-400 mt-1">{createdDate}</div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                No recent activity
               </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-green-600">YH</div>
-              <div>
-                <span className="font-semibold text-gray-700">Younes Haloui</span> shared &apos;Science Lab Safety&apos; with <span className="font-bold text-green-600">Mr. Khalid</span>
-                <div className="text-xs text-gray-400 mt-1">2 March 2021, 13:45 PM</div>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-blue-500">YE</div>
-              <div>
-                <span className="font-semibold text-gray-700">Youssef Elhouari</span> edited the lesson <span className="font-bold text-blue-600 underline cursor-pointer">Algebra Basics: Part I</span>
-                <div className="text-xs text-gray-400 mt-1">2 March 2021, 13:45 PM</div>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700">SW</div>
-              <div>
-                <span className="font-semibold text-gray-700">Sam William</span> created new content: <span className="font-bold text-red-500">Functions</span>
-                <div className="text-xs text-gray-400 mt-1">2 March 2021, 13:45 PM</div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
         {/* Content Type Usage */}
