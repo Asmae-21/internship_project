@@ -20,7 +20,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300 bg-background border-r",
+        "fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300 border-r dark:bg-[#0f172a] bg-[#F7F8FA]",
         isOpen ? "w-64" : "w-[72px]",
       )}
     >
@@ -29,7 +29,15 @@ export function Sidebar() {
         {/* Top: Toggle and main menu */}
         <div className="px-3 pt-4 flex flex-col flex-grow">
           <div className="invisible lg:visible absolute top-3 -right-4 z-20">
-            <Button onClick={toggle} className="rounded-md w-8 h-8 bg-transparent" variant="outline" size="icon">
+            <Button 
+              onClick={toggle} 
+              className={cn(
+                "rounded-md w-8 h-8 bg-transparent",
+                "border-gray-200 dark:border-gray-700",
+                "hover:bg-gray-100 dark:hover:bg-gray-800"
+              )} 
+              variant="outline" 
+              size="icon">
               <ChevronLeft
                 className={cn("h-4 w-4 transition-transform ease-in-out duration-300", isOpen ? "rotate-0" : "rotate-180")}
               />
@@ -60,8 +68,10 @@ export function Sidebar() {
                       <Button
                         variant="ghost"
                         className={cn(
-                          "w-full justify-start h-10 rounded-lg font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors",
-                          pathname === item.href && "bg-[#FF1493] text-white hover:bg-[#FF1493]/90",
+                          "w-full justify-start h-10 rounded-lg font-medium transition-colors",
+                          "text-gray-700 dark:text-gray-300",
+                          "hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400",
+                          pathname === item.href && "bg-[#FF1493] text-white hover:bg-[#FF1493]/90 dark:bg-[#FF1493] dark:text-white dark:hover:bg-[#FF1493]/90",
                           !isOpen && "justify-center"
                         )}
                         asChild
@@ -89,13 +99,15 @@ export function Sidebar() {
         {/* Bottom: Settings and logout */}
         <div className="flex-shrink-0 pb-6">
           <div className="px-4 mb-2">
-            <span className={cn("text-xs text-gray-400 tracking-widest", isOpen ? "inline" : "hidden")}>SETTINGS</span>
+            <span className={cn("text-xs text-gray-400 dark:text-gray-500 tracking-widest", isOpen ? "inline" : "hidden")}>SETTINGS</span>
           </div>
           <nav className="flex flex-col space-y-1 px-2">
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start h-10 text-gray-700 hover:bg-gray-100 hover:text-[#FF1493] rounded-lg font-medium",
+                "w-full justify-start h-10 rounded-lg font-medium",
+                "text-gray-700 dark:text-gray-300",
+                "hover:bg-gray-100 hover:text-[#FF1493] dark:hover:bg-gray-800 dark:hover:text-[#FF1493]",
                 !isOpen && "justify-center"
               )}
               asChild
@@ -108,7 +120,9 @@ export function Sidebar() {
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start h-10 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium",
+                "w-full justify-start h-10 rounded-lg font-medium",
+                "text-red-500 dark:text-red-400",
+                "hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-300",
                 !isOpen && "justify-center"
               )}
               asChild

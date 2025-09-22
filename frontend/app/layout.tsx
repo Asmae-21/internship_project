@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/context/theme-context";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
       <html lang="en">
       <body className={outfit.className}>
-      <Toaster />
-      <main>{children}</main>
+      <ThemeProvider>
+        <Toaster />
+        <main>{children}</main>
+      </ThemeProvider>
       </body>
       </html>
   );

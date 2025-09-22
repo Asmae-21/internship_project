@@ -42,7 +42,7 @@ export function Header() {
   return (
     <header className="w-full">
       {/* Minimal Top Bar */}
-      <div className="flex h-16 items-center px-8 justify-between bg-white border-b border-gray-100">
+      <div className="flex h-16 items-center px-8 justify-between bg-white border-b border-gray-100 dark:bg-[#0f172a] dark:border-gray-700">
         {/* Left: Title */}
         <div className="flex items-center">
           <span className="uppercase tracking-widest font-bold text-gray-700 text-base">
