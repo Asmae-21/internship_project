@@ -10,6 +10,11 @@ const contentSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  type: {
+    type: String,
+    enum: ['Lesson', 'Quiz', 'Assignment', 'Project', 'Worksheet', 'Summary', 'Schema', 'Course Outline'],
+    required: true,
+  },
   tags: [{
     type: String,
     trim: true,

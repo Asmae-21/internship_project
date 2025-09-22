@@ -1,104 +1,199 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// Exact data from the image
-const contentData = [
-  {
-    id: 1,
-    title: "Photosynthesis Quiz",
-    owner: "Amin Boujidi",
-    lastUpdated: "2 Days Ago",
-    type: "Quiz",
-    access: "Private"
-  },
-  {
-    id: 2,
-    title: "Intro To Fractions",
-    owner: "Mouna Sikal",
-    lastUpdated: "June 25, 2025",
-    type: "Course Presentation",
-    access: "Shared"
-  },
-  {
-    id: 3,
-    title: "French Vocabulary Cards",
-    owner: "Maria Hostin",
-    lastUpdated: "June 18, 2025",
-    type: "Dialog Cards",
-    access: "Shared"
-  },
-  {
-    id: 4,
-    title: "Fractions",
-    owner: "Ayoub Boram",
-    lastUpdated: "May 27, 2025",
-    type: "Interactive Book",
-    access: "Private"
-  }
-];
+interface Content {
+  _id: string;
+  title: string;
+  description: string;
+  type: 'Lesson' | 'Quiz' | 'Assignment' | 'Project' | 'Worksheet' | 'Summary' | 'Schema' | 'Course Outline';
+  tags: string[];
+  files: string[];
+  createdBy: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+}
+
+interface ContentItem {
+  id: string;
+  title: string;
+  owner: string;
+  lastUpdated: string;
+  type: string;
+}
 
 export default function AdminContentAuditPage() {
+  const [contents, setContents] = useState<Content[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedAccess, setSelectedAccess] = useState("All");
+
   const [selectedType, setSelectedType] = useState("All");
   const [selectedSort, setSelectedSort] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  
+
   // Section visibility states
-  const [showAccess, setShowAccess] = useState(true);
   const [showType, setShowType] = useState(true);
   const [showDateUpdated, setShowDateUpdated] = useState(false);
   const [showSort, setShowSort] = useState(true);
 
+  // Fetch contents from API
+  useEffect(() => {
+    async function fetchContents() {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:4000/api/contents", {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch contents");
+        }
+
+        const data: Content[] = await response.json();
+        setContents(data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchContents();
+  }, []);
+
+  // Helper function to determine content type from tags and files
+  const getContentType = (content: Content): string => {
+    // Check file extensions first
+    if (content.files && content.files.length > 0) {
+      const fileExtension = content.files[0].split('.').pop()?.toLowerCase();
+      if (fileExtension) {
+        if (['pdf', 'doc', 'docx'].includes(fileExtension)) {
+          return 'Document';
+        } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+          return 'Image';
+        } else if (['mp4', 'avi', 'mov'].includes(fileExtension)) {
+          return 'Video';
+        }
+      }
+    }
+
+    // Check tags for content type hints
+    if (content.tags && content.tags.length > 0) {
+      const tagsLower = content.tags.map(tag => tag.toLowerCase());
+      if (tagsLower.some(tag => tag.includes('quiz'))) {
+        return 'Quiz';
+      } else if (tagsLower.some(tag => tag.includes('presentation'))) {
+        return 'Course Presentation';
+      } else if (tagsLower.some(tag => tag.includes('book'))) {
+        return 'Interactive Book';
+      } else if (tagsLower.some(tag => tag.includes('video'))) {
+        return 'Interactive Video';
+      } else if (tagsLower.some(tag => tag.includes('cards'))) {
+        return 'Dialog Cards';
+      }
+    }
+
+    return 'Content';
+  };
+
+
+
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Set both dates to start of day for accurate comparison
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const diffInDays = Math.floor((nowOnly.getTime() - dateOnly.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) {
+      return 'Today';
+    } else if (diffInDays === 1) {
+      return 'Yesterday';
+    } else if (diffInDays < 7) {
+      return `${diffInDays} Days Ago`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  };
+
+  // Transform backend data to frontend format
+  const transformContentData = (contents: Content[]): ContentItem[] => {
+    return contents.map(content => ({
+      id: content._id,
+      title: content.title,
+      owner: `${content.createdBy.firstName} ${content.createdBy.lastName}`,
+      lastUpdated: formatDate(content.updatedAt || content.createdAt),
+      type: content.type, // Use the actual type from database
+    }));
+  };
+
   // Helper function to convert date picker format to readable format
   const formatDateForComparison = (dateString: string) => {
     if (!dateString) return "";
-    
+
     const date = new Date(dateString);
     const months = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
-    
+
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
-    
+
     return `${month} ${day}, ${year}`;
   };
 
   // Helper function to check if a relative date matches the selected date
   const checkRelativeDate = (relativeDate: string, selectedDate: string) => {
     if (!selectedDate) return true;
-    
+
     const today = new Date();
     const selected = new Date(selectedDate);
-    
+
     // Calculate the date that "2 Days Ago" would be
     if (relativeDate.includes("Days Ago")) {
       const daysAgo = parseInt(relativeDate.split(" ")[0]);
       const calculatedDate = new Date(today);
       calculatedDate.setDate(today.getDate() - daysAgo);
-      
+
       return calculatedDate.toDateString() === selected.toDateString();
     }
-    
+
     return false;
   };
 
   // Helper function to check if a date falls within a range
   const isDateInRange = (itemDate: string, startDate: string, endDate: string) => {
     if (!startDate && !endDate) return true;
-    
+
     const today = new Date();
     let itemDateObj: Date;
-    
+
     // Handle relative dates like "2 Days Ago"
     if (itemDate.includes("Days Ago")) {
       const daysAgo = parseInt(itemDate.split(" ")[0]);
@@ -110,18 +205,18 @@ export default function AdminContentAuditPage() {
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
-      
+
       const parts = itemDate.split(" ");
       const month = months.indexOf(parts[0]);
       const day = parseInt(parts[1].replace(",", ""));
       const year = parseInt(parts[2]);
-      
+
       itemDateObj = new Date(year, month, day);
     }
-    
+
     const startDateObj = startDate ? new Date(startDate) : null;
     const endDateObj = endDate ? new Date(endDate) : null;
-    
+
     // Check if date is within range
     if (startDateObj && endDateObj) {
       return itemDateObj >= startDateObj && itemDateObj <= endDateObj;
@@ -130,28 +225,28 @@ export default function AdminContentAuditPage() {
     } else if (endDateObj) {
       return itemDateObj <= endDateObj;
     }
-    
+
     return true;
   };
+
+  // Get the content data to display
+  const contentData = transformContentData(contents);
 
   // Filter content based on search and filters
   const filteredContent = contentData.filter((item) => {
     // Search filter
-    const matchesSearch = 
+    const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.owner.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.type.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Access filter
-    const matchesAccess = selectedAccess === "All" || item.access === selectedAccess;
-    
+
     // Type filter
     const matchesType = selectedType === "All" || item.type === selectedType;
-    
+
     // Date range filter
     const matchesDateRange = isDateInRange(item.lastUpdated, startDate, endDate);
-    
-    return matchesSearch && matchesAccess && matchesType && matchesDateRange;
+
+    return matchesSearch && matchesType && matchesDateRange;
   });
 
   // Sort content based on selected sort option
@@ -168,6 +263,22 @@ export default function AdminContentAuditPage() {
     }
   });
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg">Loading content data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Search and Filter Section */}
@@ -182,9 +293,9 @@ export default function AdminContentAuditPage() {
             className="pl-10 pr-4 py-2"
           />
         </div>
-        
+
         {/* Filter Button */}
-        <Button 
+        <Button
           className="bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2"
           onClick={() => setShowFilters(!showFilters)}
         >
@@ -195,15 +306,15 @@ export default function AdminContentAuditPage() {
 
       {/* Filter Panel */}
       {/* Overlay */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
           showFilters ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setShowFilters(false)}
       ></div>
-      
+
       {/* Drawer */}
-      <div 
+      <div
         className={`fixed right-0 top-0 h-full w-80 bg-white shadow-xl z-50 overflow-y-auto transition-transform duration-300 transform ${
           showFilters ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -214,8 +325,8 @@ export default function AdminContentAuditPage() {
             <Filter className="w-5 h-5" />
             <span className="font-bold text-black">Filters</span>
           </div>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => setShowFilters(false)}
           >
@@ -225,35 +336,9 @@ export default function AdminContentAuditPage() {
 
         {/* Filter Content */}
         <div className="p-4 space-y-6">
-          {/* Access Section */}
-          <div>
-            <div 
-              className="flex items-center justify-between mb-3 cursor-pointer"
-              onClick={() => setShowAccess(!showAccess)}
-            >
-              <span className="font-medium text-gray-500">Access</span>
-              {showAccess ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </div>
-            {showAccess && (
-              <div className="space-y-2">
-                {["All", "Private", "Shared"].map((access) => (
-                  <label key={access} className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedAccess === access}
-                      onChange={() => setSelectedAccess(access)}
-                      className="w-4 h-4 border-2 border-dashed border-gray-400 rounded"
-                    />
-                    <span className="text-black">{access}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Type Section */}
           <div>
-            <div 
+            <div
               className="flex items-center justify-between mb-3 cursor-pointer"
               onClick={() => setShowType(!showType)}
             >
@@ -262,9 +347,9 @@ export default function AdminContentAuditPage() {
             </div>
             {showType && (
               <div className="space-y-2">
-                {["All", "Quiz", "Course Presentation", "Dialog Cards", "Interactive Book"].map((type) => (
-                  <label 
-                    key={type} 
+                {["All", "Lesson", "Quiz", "Assignment", "Project", "Worksheet", "Summary", "Schema", "Course Outline"].map((type) => (
+                  <label
+                    key={type}
                     className={`flex items-center gap-3 cursor-pointer p-1 rounded ${
                       selectedType === type ? "bg-gray-100" : ""
                     }`}
@@ -284,7 +369,7 @@ export default function AdminContentAuditPage() {
 
           {/* Date Updated Section */}
           <div>
-            <div 
+            <div
               className="flex items-center justify-between mb-3 cursor-pointer"
               onClick={() => setShowDateUpdated(!showDateUpdated)}
             >
@@ -317,7 +402,7 @@ export default function AdminContentAuditPage() {
 
           {/* Sort By Section */}
           <div>
-            <div 
+            <div
               className="flex items-center justify-between mb-3 cursor-pointer"
               onClick={() => setShowSort(!showSort)}
             >
@@ -340,9 +425,9 @@ export default function AdminContentAuditPage() {
               </div>
             )}
           </div>
-          
+
           {/* Apply Filters Button */}
-          <Button 
+          <Button
             className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white"
             onClick={() => setShowFilters(false)}
           >
@@ -369,9 +454,6 @@ export default function AdminContentAuditPage() {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Access
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -392,13 +474,6 @@ export default function AdminContentAuditPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-600">
                     {item.type}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      item.access === "Private" ? "bg-slate-100 text-blue-600" : "bg-yellow-100 text-yellow-800"
-                    }`}>
-                      {item.access}
-                    </span>
                   </td>
                 </tr>
               ))}

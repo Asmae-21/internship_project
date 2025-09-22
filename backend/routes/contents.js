@@ -16,6 +16,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get content type statistics
+router.get('/stats/types', async (req, res) => {
+  try {
+    const contentTypeStats = await Content.aggregate([
+      {
+        $group: {
+          _id: '$type',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    res.status(200).json(contentTypeStats);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
 // Get content by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -30,13 +51,13 @@ router.get('/:id', async (req, res) => {
 // Create new content
 router.post('/', uploadMiddleware('files'), async (req, res) => {
   try {
-    const { title, description, tags, createdBy } = req.body;
+    const { title, description, type, tags, createdBy } = req.body;
 
     // Validate required fields
-    if (!title || !createdBy) {
+    if (!title || !createdBy || !type) {
       return res.status(400).json({
         error: 'Missing required fields',
-        details: 'Title and createdBy are required'
+        details: 'Title, createdBy, and type are required'
       });
     }
 
@@ -120,7 +141,7 @@ router.post('/', uploadMiddleware('files'), async (req, res) => {
 // Update content
 router.put('/:id', uploadMiddleware('files'), async (req, res) => {
   try {
-    const { title, description, tags, isActive } = req.body;
+    const { title, description, type, tags, isActive } = req.body;
 
     // Safely parse tags for update
     let parsedTags = undefined;
