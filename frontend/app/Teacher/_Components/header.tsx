@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MenuIcon, PanelsTopLeft, LogOut, User, Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,6 +25,15 @@ export function Header() {
   const pathname = usePathname();
   const menuItems = getMenuList();
   const { toggle } = useSidebarState();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Get current user from localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
+    }
+  }, []);
 
   // Find the menu item that matches the current path
   let title = "DASHBOARD";
@@ -78,8 +88,11 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full" asChild>
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User Avatar" />
-                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarImage
+                        src={currentUser?.photo ? `http://localhost:4000${currentUser.photo}` : "/placeholder.svg?height=40&width=40"}
+                        alt={`${currentUser?.firstName || ""} ${currentUser?.lastName || ""}`.trim() || "User Avatar"}
+                      />
+                      <AvatarFallback>{currentUser ? `${currentUser.firstName?.charAt(0) || ""}${currentUser.lastName?.charAt(0) || ""}`.toUpperCase() || "U" : "U"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -91,8 +104,12 @@ export function Header() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">John Doe</p>
-                <p className="text-xs leading-none text-muted-foreground">john.doe@example.com</p>
+                <p className="text-sm font-medium leading-none">
+                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : "John Doe"}
+                </p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {currentUser?.email || "john.doe@example.com"}
+                </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -105,7 +122,11 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => alert("Signing out...")}>
+            <DropdownMenuItem onClick={() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('currentUser');
+              window.location.href = '/Login';
+            }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

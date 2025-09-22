@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
-const { uploadMiddleware } = require('../middleware/errorHandler');
+const { profileUploadMiddleware } = require('../middleware/errorHandler');
 // const { verifyToken, isAdmin } = require('../middleware/auth'); // Comment out these lines
 
 // Apply authentication to all routes
@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new user
-router.post('/', uploadMiddleware('photo'), async (req, res) => {
+router.post('/', profileUploadMiddleware('photo'), async (req, res) => {
   try {
     const { firstName, lastName, email, phone, classes, subjects, password, role } = req.body;
     
@@ -82,7 +82,7 @@ router.post('/', uploadMiddleware('photo'), async (req, res) => {
 });
 
 // Update user
-router.put('/:id', uploadMiddleware('photo'), async (req, res) => {
+router.put('/:id', profileUploadMiddleware('photo'), async (req, res) => {
   try {
     const { firstName, lastName, email, phone, classes, subjects, role, isActive } = req.body;
     
