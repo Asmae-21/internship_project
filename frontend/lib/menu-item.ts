@@ -6,7 +6,6 @@ import {
   BarChart,
   type LucideIcon,
   LayoutDashboard,
-  Library,
   LogOut,
   FileText,
 } from "lucide-react";
@@ -30,12 +29,6 @@ export function getMenuList(): MenuItem[] {
       href: "/Teacher/Content",
       label: "My Content",
       icon: FileText,
-    },
-
-    {
-      href: "/Teacher/Library",
-      label: "My Library",
-      icon: Library,
     },
   ];
 }
