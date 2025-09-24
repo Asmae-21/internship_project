@@ -16,6 +16,29 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get content count for a specific teacher
+router.get('/teacher/:teacherId/count', async (req, res) => {
+  try {
+    const count = await Content.countDocuments({ createdBy: req.params.teacherId });
+    res.status(200).json({ count });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
+// Get recent contents for a specific teacher
+router.get('/teacher/:teacherId/recent', async (req, res) => {
+  try {
+    const contents = await Content.find({ createdBy: req.params.teacherId })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('title type createdAt');
+    res.status(200).json(contents);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
 // Get content type statistics
 router.get('/stats/types', async (req, res) => {
   try {

@@ -1,54 +1,78 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { WelcomeBanner } from "../_Components/dashboard/WelcomeBanner";
 import { StatsCards } from "../_Components/dashboard/StatsCards";
 import { ContentShortcuts } from "../_Components/dashboard/ContentShortcuts";
 import { RecentLessons } from "../_Components/dashboard/RecentLessons";
-
-// Mock data for now, replace with API data later
-const stats = {
-  myContent: 18,
-  sharedContent: 5,
-  myFolders: 4,
-};
-
-const lessons = [
-  {
-    title: "Photosynthesis Quiz",
-    updated: "2 Days Ago",
-    type: "Quiz",
-    access: "Only Me",
-    actions: ["Edit", "Duplicate", "Download", "Move", "Share", "Delete"],
-  },
-  {
-    title: "Intro To Fractions",
-    updated: "June 25, 2025",
-    type: "Course Presentation",
-    access: "Sarah",
-    actions: ["Edit", "Duplicate", "Download", "Move", "Share", "Delete"],
-  },
-  {
-    title: "French Vocabulary Cards",
-    updated: "June 18, 2025",
-    type: "Dialog Cards",
-    access: "Ahmed",
-    actions: ["Edit", "Duplicate", "Download", "Move", "Share", "Delete"],
-  },
-  {
-    title: "Fractions",
-    updated: "May 27, 2025",
-    type: "Interactive Book",
-    access: "Only Me",
-    actions: ["Edit", "Duplicate", "Download", "Move", "Share", "Delete"],
-  },
-];
+import { getApiUrl, getAuthHeaders } from "@/lib/api-config";
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState({
+    myContent: 0,
+  });
+
+  const [lessons, setLessons] = useState([
+    {
+      title: "Loading...",
+      type: "Loading...",
+      createdAt: "Loading...",
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.id;
+
+        // Fetch content count
+        const countResponse = await fetch(getApiUrl(`contents/teacher/${userId}/count`), {
+          headers: getAuthHeaders(),
+        });
+        if (countResponse.ok) {
+          const countData = await countResponse.json();
+          setStats({ myContent: countData.count });
+        }
+
+        // Fetch recent lessons
+        const lessonsResponse = await fetch(getApiUrl(`contents/teacher/${userId}/recent`), {
+          headers: getAuthHeaders(),
+        });
+        if (lessonsResponse.ok) {
+          const lessonsData = await lessonsResponse.json();
+          const formattedLessons = lessonsData.map((lesson: any) => ({
+            title: lesson.title,
+            type: lesson.type,
+            createdAt: new Date(lesson.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })
+          }));
+          setLessons(formattedLessons);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
-    <div className="flex flex-col gap-8 p-6">
-      <WelcomeBanner />
-      <StatsCards stats={stats} />
-      <ContentShortcuts />
-      <RecentLessons lessons={lessons} />
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <WelcomeBanner />
+        <StatsCards stats={stats} />
+        <div className="grid grid-cols-1 gap-6">
+          <div className="w-full">
+            <RecentLessons lessons={lessons} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

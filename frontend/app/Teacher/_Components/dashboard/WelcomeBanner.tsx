@@ -1,8 +1,51 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Star } from 'lucide-react';
+import { getApiUrl, getAuthHeaders } from "@/lib/api-config";
 
 export const WelcomeBanner: React.FC = () => {
+  const [userName, setUserName] = useState("User");
+  const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(getApiUrl('auth/me'), {
+          headers: getAuthHeaders(),
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setUserName(`${userData.firstName} ${userData.lastName}`);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Fallback to localStorage if API fails
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            // This is a fallback - in a real app, you'd store user data in localStorage on login
+            setUserName("User");
+          } catch (e) {
+            console.error('Error parsing token:', e);
+          }
+        }
+      }
+    };
+
+    fetchUserData();
+
+    // Set current date
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    setCurrentDate(today.toLocaleDateString('en-US', options));
+  }, []);
+
   return (
     <div className="w-full rounded-2xl bg-[#4B3DFE] flex items-start justify-between px-10 pt-4 pb-12 relative overflow-hidden min-h-[140px] shadow-xl backdrop-blur-md border border-[#e0e7ff]">
       {/* Glassmorphism overlay */}
@@ -12,10 +55,10 @@ export const WelcomeBanner: React.FC = () => {
       
       <div className="flex flex-col gap-2 z-10">
         <span className="text-sm font-extrabold tracking-wide text-white">
-          WELCOME BACK, YASSINE!
+          WELCOME BACK, {userName.toUpperCase()}!
         </span>
         <span className="text-lg md:text-xl font-semibold text-white/90 tracking-wide">
-          THURSDAY, 20 MARCH 2025
+          {currentDate}
         </span>
       </div>
       {/* Graduation cap image */}
