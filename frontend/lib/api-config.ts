@@ -1,5 +1,5 @@
 // API configuration
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // Helper function to get the full API URL
 export function getApiUrl(endpoint: string): string {
