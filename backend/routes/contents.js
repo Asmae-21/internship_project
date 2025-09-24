@@ -85,7 +85,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new content
-router.post('/', uploadMiddleware('files'), async (req, res) => {
+const multer = require('multer');
+const upload = multer();
+
+router.post('/', upload.none(), async (req, res) => {
   try {
     const { title, description, type, tags, createdBy } = req.body;
 

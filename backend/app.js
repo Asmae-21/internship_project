@@ -16,6 +16,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Fix: Add multer middleware before JSON parser to handle multipart/form-data
+const multer = require('multer');
+const upload = multer();
+
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -25,12 +29,14 @@ const userRoutes = require('./routes/users');
 const contentRoutes = require('./routes/contents');
 const logsRoutes = require('./routes/logs');
 const reportsRoutes = require('./routes/reports');
+const chatbotRoutes = require('./routes/chatbot');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contents', contentRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;

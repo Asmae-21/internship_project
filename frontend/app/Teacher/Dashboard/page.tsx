@@ -4,6 +4,7 @@ import { WelcomeBanner } from "../_Components/dashboard/WelcomeBanner";
 import { StatsCards } from "../_Components/dashboard/StatsCards";
 import { ContentShortcuts } from "../_Components/dashboard/ContentShortcuts";
 import { RecentLessons } from "../_Components/dashboard/RecentLessons";
+import { FloatingChatButton } from "../_Components/dashboard/FloatingChatButton";
 import { getApiUrl, getAuthHeaders } from "@/lib/api-config";
 
 export default function DashboardPage() {
@@ -73,6 +74,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      <FloatingChatButton />
     </div>
   );
 }
