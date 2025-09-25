@@ -73,7 +73,6 @@ router.get('/stats/types', async (req, res) => {
   }
 });
 
-// Get content by ID
 router.get('/:id', async (req, res) => {
   try {
     const content = await Content.findById(req.params.id).populate('createdBy', 'firstName lastName email');
@@ -85,10 +84,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new content
-const multer = require('multer');
-const upload = multer();
-
-router.post('/', upload.none(), async (req, res) => {
+router.post('/', uploadMiddleware('files'), async (req, res) => {
   try {
     const { title, description, type, tags, createdBy } = req.body;
 
