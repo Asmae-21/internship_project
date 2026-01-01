@@ -1,21 +1,63 @@
 version: '3.8'
 
 services:
-  mongodb:
+  mongo:
     image: mongo:7.0
     container_name: auth-service-mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
+    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_ROOT_PASSWORD: securepassword123
       MONGO_INITDB_DATABASE: auth-service
+    ports:
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./mongo-init:/docker-entrypoint-initdb.d
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init.js:ro
     networks:
       - auth-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auth-service-backend
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:securepassword123@mongo:27017/auth-service?authSource=admin
+      - JWT_SECRET=your-secret-key-here
+      - PORT=4000
+    depends_on:
+      - mongo
+    networks:
+      - auth-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: auth-service-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - auth-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
 
 volumes:
   mongodb_data:
