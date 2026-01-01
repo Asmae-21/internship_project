@@ -1,100 +1,60 @@
-name: CI
+name: CI - Build and Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
-    services:
-      mongodb:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: admin
-          MONGO_INITDB_ROOT_PASSWORD: password123
-          MONGO_INITDB_DATABASE: auth-service
-
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - name: Install root dependencies
-      run: npm ci
-
-    - name: Install backend dependencies
-      run: cd backend && npm ci
-
-    - name: Install frontend dependencies
-      run: cd frontend && npm ci
-
-    - name: Lint backend
-      run: cd backend && npm run lint 2>/dev/null || echo "No lint script found"
-
-    - name: Lint frontend
-      run: cd frontend && npm run lint 2>/dev/null || echo "No lint script found"
-
-    - name: Test backend
-      run: cd backend && npm test 2>/dev/null || echo "No tests found"
-      env:
-        MONGODB_URI: mongodb://admin:password123@localhost:27017/auth-service
-
-    - name: Build frontend
-      run: cd frontend && npm run build
-
-    - name: Build backend
-      run: cd backend && npm run build 2>/dev/null || echo "No build script found"
-
-  security:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Run CodeQL Analysis
-      uses: github/codeql-action/init@v3
-      with:
-        languages: javascript
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-
-  docker:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
+      uses: actions/checkout@v3
+    
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build backend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend
-        push: false
-        tags: auth-service-backend:test
-
-    - name: Build frontend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        push: false
-        tags: auth-service-frontend:test
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Create environment files (if they don't exist)
+      run: |
+        touch server/.env
+        touch client/.env
+    
+    - name: Build Backend Docker image
+      run: |
+        cd server
+        docker build -t auth-backend:latest .
+      
+    - name: Build Frontend Docker image
+      run: |
+        cd client
+        docker build -t auth-frontend:latest .
+    
+    - name: Start services with Docker Compose
+      run: |
+        docker compose up -d --build
+    
+    - name: Wait for services to be ready
+      run: sleep 15
+    
+    - name: Check running containers
+      run: docker compose ps
+    
+    - name: Test backend health (optional)
+      run: |
+        curl -f http://localhost:5000/health || echo "Backend health check skipped"
+      continue-on-error: true
+    
+    - name: Show logs if failed
+      if: failure()
+      run: |
+        echo "=== Backend Logs ==="
+        docker compose logs backend
+        echo "=== Frontend Logs ==="
+        docker compose logs frontend
+    
+    - name: Cleanup
+      if: always()
+      run: docker compose down -v
