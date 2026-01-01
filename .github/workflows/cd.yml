@@ -41,4 +41,8 @@ jobs:
     # Or deploy to cloud platforms:
     # - name: Deploy to AWS/Heroku/DigitalOcean
     #   run: |
+<<<<<<< HEAD
     #     echo "Add your deployment commands here"
+=======
+    #     echo "Add your deployment commands here"
+>>>>>>> 25e8544 (Add complete Docker setup with CI/CD pipelines)
