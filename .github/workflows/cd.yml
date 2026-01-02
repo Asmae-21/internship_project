@@ -38,4 +38,16 @@ jobs:
         echo ""
         echo "════════════════════════════════════════"
     
-    # Uncomment when ready to deplo
+    # Uncomment when ready to deploy to production
+    # - name: Deploy to Production Server
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.DEPLOY_HOST }}
+    #     username: ${{ secrets.DEPLOY_USER }}
+    #     key: ${{ secrets.DEPLOY_KEY }}
+    #     script: |
+    #       cd /var/www/internship_project
+    #       git pull origin main
+    #       docker compose down
+    #       docker compose up -d --build --remove-orphans
+    #       docker compose logs --tail=50

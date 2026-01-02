@@ -17,13 +17,13 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     
-    - name: Verify init-mongo.js exists
+    - name: Verify MongoDB init script exists
       run: |
-        if [ -f init-mongo.js ]; then
-          echo "✅ init-mongo.js found"
-          head -5 init-mongo.js
+        if [ -f mongo-init/init.js ]; then
+          echo "✅ mongo-init/init.js found"
+          head -5 mongo-init/init.js
         else
-          echo "❌ init-mongo.js not found!"
+          echo "❌ mongo-init/init.js not found!"
           exit 1
         fi
     
