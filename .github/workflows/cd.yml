@@ -10,7 +10,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Only run if CI passed
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
@@ -19,30 +18,24 @@ jobs:
     
     - name: Deployment Ready
       run: |
-        echo "✅ CI Pipeline passed successfully!"
-        echo "🚀 Ready for deployment"
+        echo "════════════════════════════════════════"
+        echo "✅ CI Pipeline Passed Successfully!"
+        echo "════════════════════════════════════════"
         echo ""
-        echo "Current commit: ${{ github.sha }}"
-        echo "Triggered by: ${{ github.actor }}"
+        echo "📦 Services built and tested:"
+        echo "  • MongoDB 7.0 with initialized data"
+        echo "  • Backend API (Node.js) on port 4000"
+        echo "  • Frontend (Next.js) on port 3000"
+        echo ""
+        echo "📊 Database initialized with:"
+        echo "  • 2 test users (teacher + admin)"
+        echo "  • 3 sample content items"
+        echo "  • Activity logs"
+        echo ""
+        echo "🚀 Ready for deployment"
+        echo "📝 Commit: ${{ github.sha }}"
+        echo "👤 Author: ${{ github.actor }}"
+        echo ""
+        echo "════════════════════════════════════════"
     
-    # Uncomment and configure when you're ready to deploy
-    # - name: Deploy to Production Server
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.DEPLOY_HOST }}
-    #     username: ${{ secrets.DEPLOY_USER }}
-    #     key: ${{ secrets.DEPLOY_KEY }}
-    #     script: |
-    #       cd /var/www/internship_project
-    #       git pull origin main
-    #       docker compose down
-    #       docker compose up -d --build
-    
-    # Or deploy to cloud platforms:
-    # - name: Deploy to AWS/Heroku/DigitalOcean
-    #   run: |
-<<<<<<< HEAD
-    #     echo "Add your deployment commands here"
-=======
-    #     echo "Add your deployment commands here"
->>>>>>> 25e8544 (Add complete Docker setup with CI/CD pipelines)
+    # Uncomment when ready to deplo
